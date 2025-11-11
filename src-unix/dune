@@ -1,3 +1,9 @@
+(rule
+  (with-stdout-to c_flags.cc (echo "(-Wall -Wextra -O3)")))
+
+(rule
+  (with-stdout-to c_flags.msvc (echo "(/W2 /Ox)")))
+
 (library
   (public_name notty-community.unix)
   (synopsis "Notty Unix IO")
@@ -8,7 +14,7 @@
     (names winsize)
     (flags
       :standard
-      (-Wall -Wextra -O3)))
+      (:include c_flags.%{ocaml-config:ccomp_type})))
   (optional)
   (libraries notty-community unix))
 

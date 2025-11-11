@@ -34,9 +34,11 @@ module Private = struct
     with Unix_error (ENOTTY, _, _) -> `Revert ignore
 
   let set_winch_handler f =
-    let signum = winch_number () in
-    let old_hdl = Sys.(signal signum (Signal_handle (fun _ -> f ()))) in
-    `Revert (once @@ fun () -> Sys.set_signal signum old_hdl)
+    match winch_number () with
+    | 0 -> `Revert (once @@ fun () -> ())
+    | signum ->
+       let old_hdl = Sys.(signal signum (Signal_handle (fun _ -> f ()))) in
+       `Revert (once @@ fun () -> Sys.set_signal signum old_hdl)
 
   module Gen_output (O : sig
     type fd
