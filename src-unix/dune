@@ -11,7 +11,7 @@
   (wrapped false)
   (foreign_stubs
     (language c)
-    (names winsize)
+    (names winsize win_console)
     (flags
       :standard
       (:include c_flags.%{ocaml-config:ccomp_type})))
