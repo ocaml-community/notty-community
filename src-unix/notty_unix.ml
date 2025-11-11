@@ -31,7 +31,9 @@ module Private = struct
       tcsetattr fd TCSANOW
         ( if nosig then { tc1 with c_isig = false; c_ixon = false } else tc1 );
       `Revert (once @@ fun _ -> tcsetattr fd TCSANOW tc)
-    with Unix_error (ENOTTY, _, _) -> `Revert ignore
+    with
+    | Unix_error (ENOTTY, _, _) -> `Revert ignore
+    | Invalid_argument _ -> `Revert ignore  (* Windows: tcgetattr not implemented *)
 
   let set_winch_handler f =
     match winch_number () with
