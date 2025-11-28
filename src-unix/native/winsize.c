@@ -2,7 +2,7 @@
 
 /* Portable unused parameter macro */
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
-#define unused(x) [[maybe_unused]] (x)
+#define unused(x) [[maybe_unused]] x
 #elif defined(__GNUC__)
 #define unused(x) __attribute__((unused)) x
 #else
