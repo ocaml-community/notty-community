@@ -1,5 +1,8 @@
 # Notty — Declaring terminals
 
+> **Community takeover:** This is a community-maintained fork of the original
+> [notty](https://github.com/pqwy/notty) project by [@pqwy](https://github.com/pqwy).
+
 <a href="https://asciinema.org/a/ZIXzn2ZmIxK39qoT3eJla5OyO" alt="dumper"><img src="https://asciinema.org/a/ZIXzn2ZmIxK39qoT3eJla5OyO.png" width="400"/></a>
 <a href="https://asciinema.org/a/TsIhDJv5S00AB2biVmhHRzZ8I" alt="input"><img src="https://asciinema.org/a/TsIhDJv5S00AB2biVmhHRzZ8I.png" width="400"/></a>
 <a href="https://asciinema.org/a/z1Pc0Mppg2JFzteZzdeigLwYc" alt="microdots"><img src="https://asciinema.org/a/z1Pc0Mppg2JFzteZzdeigLwYc.png" width="400"/></a>
@@ -43,9 +46,9 @@ let render (w, h) step life : image =
     if CSet.mem pt life then dot else background step pt
 ```
 
-[documentation]: https://pqwy.github.io/notty/doc
-[examples]: http://pqwy.github.io/notty/doc/Notty.html#examples
-[interface]: https://github.com/pqwy/notty/blob/master/src/notty.mli
+[documentation]: https://ocaml.org/p/notty-community/latest/doc/index.html
+[examples]: https://github.com/ocaml-community/notty-community/tree/master/examples
+[interface]: https://github.com/ocaml-community/notty-community/blob/master/src/notty.mli
 [vty]: https://hackage.haskell.org/package/vty
 
 ## What?
