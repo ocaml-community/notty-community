@@ -739,7 +739,7 @@ module Unescape = struct
 
     | C0 '\x1b'        -> key `Escape []
     | C0 ('\b'|'\x7f') -> key `Backspace []
-    | C0 '\n'          -> key `Enter []
+    | C0 ('\n'|'\r')   -> key `Enter []
     | C0 '\t'          -> key `Tab []
 
     | C0 x -> key (`ASCII Char.(code x + 0x40 |> unsafe_chr)) [`Ctrl]

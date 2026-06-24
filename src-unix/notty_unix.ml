@@ -5,6 +5,7 @@ open Notty
 
 external c_winsize : Unix.file_descr -> int = "caml_notty_winsize" [@@noalloc]
 external winch_number : unit -> int = "caml_notty_winch_number" [@@noalloc]
+external setup_windows_console : unit -> int = "caml_notty_setup_windows_console" [@@noalloc]
 
 let iter f = function Some x -> f x | _ -> ()
 let value x = function Some a -> a | _ -> x
@@ -19,10 +20,14 @@ module Private = struct
 
   let cap_for_fd =
     let open Cap in
+    let windows_vt_enabled = lazy (setup_windows_console () = 1) in
     match Sys.getenv "TERM" with
-    | exception Not_found -> fun _ -> dumb
-    | (""|"dumb")         -> fun _ -> dumb
-    | _                   -> fun fd -> if Unix.isatty fd then ansi else dumb
+    | exception Not_found ->
+        (* No TERM variable: likely Windows. Try to enable VT processing. *)
+        fun fd ->
+          if Unix.isatty fd && Lazy.force windows_vt_enabled then ansi else dumb
+    | (""|"dumb") -> fun _ -> dumb
+    | _ -> fun fd -> if Unix.isatty fd then ansi else dumb
 
   let setup_tcattr ~nosig fd =
     let open Unix in try
@@ -31,12 +36,16 @@ module Private = struct
       tcsetattr fd TCSANOW
         ( if nosig then { tc1 with c_isig = false; c_ixon = false } else tc1 );
       `Revert (once @@ fun _ -> tcsetattr fd TCSANOW tc)
-    with Unix_error (ENOTTY, _, _) -> `Revert ignore
+    with
+    | Unix_error (ENOTTY, _, _) -> `Revert ignore
+    | Invalid_argument _ -> `Revert ignore  (* Windows: tcgetattr not implemented *)
 
   let set_winch_handler f =
-    let signum = winch_number () in
-    let old_hdl = Sys.(signal signum (Signal_handle (fun _ -> f ()))) in
-    `Revert (once @@ fun () -> Sys.set_signal signum old_hdl)
+    match winch_number () with
+    | 0 -> `Revert (once @@ fun () -> ())
+    | signum ->
+       let old_hdl = Sys.(signal signum (Signal_handle (fun _ -> f ()))) in
+       `Revert (once @@ fun () -> Sys.set_signal signum old_hdl)
 
   module Gen_output (O : sig
     type fd
